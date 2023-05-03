@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manutenção de Notas</title>
+</head>
+
+<body>
+    <div id="tela1">
+        <h1>Manutenção de Notas</h1>
+        <br>
+        RA: <input type="text" id="ipt_Ra">
+        NOTA: <input type="text" id="ipt_InsertNota"><br>
+        <button onclick="cadastrar()">Incluir</button>
+        <button onclick="excluir()">Excluir</button>
+        <br>
+        <button onclick="alterar()">Alterar</button>
+        Nota: <input type="text" id="ipt_AltNota"><br>
+        <button onclick="Consultar()">Eliminar buraco e consultar</button><br><br>
+        <button onclick="Ajustar()">Ajustar Notas</button><br><br>
+
+        <div id="div_vetorInicial"></div>
+    </div>
+    <div id="consulta" style="display: none;">
+        <button onclick="filtrarRa()">Por Ra</button>
+        De: <input type="text" id="ipt_initialRa">
+        Até: <input type="text" id="ipt_finalRa"><br><br>
+        <button onclick="filtrarNota()">Por Nota</button>
+        De: <input type="text" id="ipt_initialNota">
+        Até: <input type="text" id="ipt_finalNota">
+
+
+        <br><br>
+
+
+
+        <div id="resConsulta"></div>
+        <div id="resDados"></div>
+
+    </div>
+    <div id="ajuste" style="display: none;">
+        <h1>Tela de Ajuste de Notas</h1>
+        RA de <input type="text" id="ipt_AjustRa">
+        Até <input type="text" id="ipt_ajustRaAte"><br>
+
+        <button onclick="Bonus()">Bônus</button> 
+        <button onclick="Reducao()">Redução</button>
+        Pontos <input type="text" id="ipt_pontos"> ou 
+        % <input type="text" id="ipt_percent"><br>
+
+        <div id="resAjuste"></div>
+        
+    </div>
+</body>
+
+</html>
+<script>
+    var arrayRa = [];
+    var arrayNota = [];
+    var ArrayNotaSemEspaco = []
+    var ArrayRaSemEspaco = []
+    var TotalArray = 0;
+    var QuantidadeArray = 0;
+    var MaiorArray = 0;
+    var MenorArray = 10;
+
+    function cadastrar() {
+        var ra = Number(ipt_Ra.value);
+        var nota = Number(ipt_InsertNota.value);
+        var existe = false;
+        if (ra >= 2000 && ra < 3000 && nota >= 0 && nota <= 10) {
+            for (var i = 0; i <= arrayRa.length - 1; i++) {
+                if (arrayRa[i] == ra) {
+                    existe = true;
+                    break;
+                }
+            }
+            if (existe == false) {
+                arrayRa.push(ra);
+                arrayNota.push(nota);
+                alert("Dados inseridos");
+
+            } else {
+                alert("Já existe esse RA")
+            }
+            div_vetorInicial.innerHTML = ""
+            for (var i = 0; i <= arrayRa.length - 1; i++) {
+                div_vetorInicial.innerHTML += `RA: ${arrayRa[i]} - NOTA =  ${arrayNota[i]}<br>`;
+            }
+        } else {
+            alert("Valores inválidos");
+        }
+
+    }
+
+    function excluir() {
+        var ra = Number(ipt_Ra.value);
+        var nota = Number(ipt_InsertNota.value);
+        var posicao = -2;
+        if (ra >= 2000 && ra < 3000 && nota >= 0 && nota <= 10) {
+            for (var i = 0; i <= arrayRa.length - 1; i++) {
+                if (arrayRa[i] == ra && arrayNota[i] == nota) {
+                    posicao = i;
+                    break;
+                }
+            }
+            if (posicao > -2) {
+                arrayRa[posicao] = undefined;
+                arrayNota[posicao] = undefined;
+                alert("Dados excluidos");
+
+            } else {
+                alert("Não encontrado")
+            }
+            div_vetorInicial.innerHTML = ""
+            for (var i = 0; i <= arrayRa.length - 1; i++) {
+                div_vetorInicial.innerHTML += `RA: ${arrayRa[i]} - NOTA =  ${arrayNota[i]}<Br>`;
+            }
+        } else {
+            alert("Valores inválidos");
+        }
+    }
+
+    function alterar() {
+        var ra = Number(ipt_Ra.value);
+        var nota = Number(ipt_InsertNota.value);
+        var altNota = Number(ipt_AltNota.value);
+        var posicao = -2;
+
+        if (ra >= 2000 && ra < 3000 && nota >= 0 && nota <= 10 && altNota >= 0 && altNota <= 10) {
+            for (var i = 0; i <= arrayRa.length - 1; i++) {
+                if (arrayRa[i] == ra && arrayNota[i] == nota) {
+                    posicao = i;
+                    break;
+                }
+            }
+            if (posicao > -2) {
+                arrayNota[posicao] = altNota;
+                alert("Alterado")
+            } else {
+                alert("Não encontrado")
+            }
+            div_vetorInicial.innerHTML = ""
+            for (var i = 0; i <= arrayRa.length - 1; i++) {
+                div_vetorInicial.innerHTML += `RA: ${arrayRa[i]} - NOTA =  ${arrayNota[i]}<br>`;
+            }
+        } else {
+            alert("Valores inválidos")
+        }
+    }
+
+    function Consultar() {
+        var contador = 0;
+        for (var i = 0; i <= arrayRa.length; i++) {
+            if (arrayRa[i] != undefined && arrayNota[i] != undefined) {
+                ArrayRaSemEspaco[contador] = arrayRa[i];
+                ArrayNotaSemEspaco[contador] = arrayNota[i];
+                contador++;
+                TotalArray += arrayNota[i];
+                QuantidadeArray++;
+                if(MaiorArray < arrayNota[i]){
+                    MaiorArray = arrayNota[i];
+                }
+                if(MenorArray > arrayNota[i]){
+                    MenorArray = arrayNota[i];
+                }
+            }
+        }
+        tela1.style.display = "none";
+        consulta.style.display = "block"
+        alert(ArrayRaSemEspaco)
+        for (var i = 0; i <= ArrayRaSemEspaco.length - 1; i++) {
+            resConsulta.innerHTML += `RA: ${ArrayRaSemEspaco[i]} - NOTA =  ${ArrayNotaSemEspaco[i]}<br>`;
+        }
+
+    }
+
+    function filtrarRa() {
+        initialRa = Number(ipt_initialRa.value)
+        finalRa = Number(ipt_finalRa.value)
+        initialNota = Number(ipt_initialNota.value)
+        finalNota = Number(ipt_finalNota.value)
+        MenorNotaVetor = 10;
+        MenorNota = 10;
+        MaiorNota = 0
+        MaiorNotaVetor = 0;
+        MediaDoVetor = 0;
+        Media = 0;
+        QuantidadeVetor = ArrayRaSemEspaco.length;
+        Quantidade = 0;
+        Total = 0;
+
+        resConsulta.innerHTML = ""
+        if (initialRa >= 2000 && initialRa < 3000 && initialRa < finalRa && finalRa >= 2000 && finalRa < 3000) {
+            for (var i = 0; i <= ArrayRaSemEspaco.length; i++) {
+                for (var h = initialRa; h <= finalRa; h++) {
+                    if (ArrayRaSemEspaco[i] == h) {
+                        resConsulta.innerHTML += `RA: ${ArrayRaSemEspaco[i]} - Nota = ${ArrayNotaSemEspaco[i]}<br>`
+                        Quantidade++;
+                        Total += ArrayNotaSemEspaco[i];
+                        if (ArrayNotaSemEspaco[i] > MaiorNota) {
+                            MaiorNota = ArrayNotaSemEspaco[i]
+                        }
+                        if (ArrayNotaSemEspaco[i] < MenorNota) {
+                            MenorNota = ArrayNotaSemEspaco[i];
+                        }
+
+                        break;
+                    }
+                }
+            }
+            resDados.innerHTML = `Maior Nota do Intervalo: ${MaiorNota}<br>
+            Menor Nota do Intervalo: ${MenorNota}<BR>
+            Média do Intervalo: ${Number(Total / Quantidade)}<BR>
+                Menor nota do array: ${MenorArray}<Br>
+                Maior Nota do Array: ${MaiorArray}<br>
+                Média do Array: ${TotalArray / QuantidadeArray}<br>`
+
+        } else {
+            alert("valores invalidos")
+        }
+    }
+
+    function filtrarNota() {
+        MenorNotaVetor = 10;
+        MenorNota = 10;
+        MaiorNota = 0
+        MaiorNotaVetor = 0;
+        MediaDoVetor = 0;
+        Media = 0;
+        QuantidadeVetor = ArrayRaSemEspaco.length;
+        Quantidade = 0;
+        Total = 0;
+        initialRa = Number(ipt_initialRa.value)
+        finalRa = Number(ipt_finalRa.value)
+        initialNota = Number(ipt_initialNota.value)
+        finalNota = Number(ipt_finalNota.value)
+
+        resConsulta.innerHTML = ""
+        if (initialNota >= 0 && initialNota <= 10 && initialNota < finalNota && finalNota >= 0 && finalRa <= 10) {
+            for (var i = 0; i <= ArrayNotaSemEspaco.length; i++) {
+                for (var h = initialNota; h <= finalNota; h++) {
+                    if (ArrayNotaSemEspaco[i] == h) {
+                        resConsulta.innerHTML += `RA: ${ArrayRaSemEspaco[i]} - Nota = ${ArrayNotaSemEspaco[i]}<br>`
+                        Total += ArrayNotaSemEspaco[i];
+                        Quantidade++;
+                        if (ArrayNotaSemEspaco[i] > MaiorNota) {
+                            MaiorNota = ArrayNotaSemEspaco[i]
+                        }
+                        if (ArrayNotaSemEspaco[i] < MenorNota) {
+                            MenorNota = ArrayNotaSemEspaco[i];
+                        }
+                        break;
+                    }
+                }
+            }
+            resDados.innerHTML = `Maior Nota do Intervalo: ${MaiorNota}<br>
+                                Menor Nota do Intervalo: ${MenorNota}<BR>
+                                Média do Intervalo: ${Number(Total / Quantidade)}<BR>
+                                Menor nota do array: ${MenorArray}<Br>
+                                Maior Nota do Array: ${MaiorArray}<br>
+                                Média do Array: ${TotalArray / QuantidadeArray}<br>`
+        } else {
+            alert("valores invalidos")
+        }
+    }
+    function bonus(){
+        initialRa = Number(ipt_ajustRa.value)
+        finalRa = Number(ipt_ajustRaAte.value)
+        if (initialRa >= 2000 && initialRa < 3000 && initialRa < finalRa && finalRa >= 2000 && finalRa < 3000) {
+            for(var h = initialRa; h <= finalRa; h++){
+                for (var i = 0; i <= ArrayRaSemEspaco.length; i++) {
+                    if(ArrayRaSemEspaco[i] == h){
+                        if(Number(ipt_pontos.value) > 0){
+                            ArrayNotaSemEspaco[i] = ArrayNotaSemEspaco[i] + Number(ipt_pontos.value);
+                        }
+                        else if(Number(ipt_percent.value) > 0){
+                            ArrayNotaSemEspaco[i] += ArrayNotaSemEspaco[i] * Number(ipt_percent.value);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+</script>
